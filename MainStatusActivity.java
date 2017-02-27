@@ -18,8 +18,6 @@ public class MainStatusActivity extends AppCompatActivity {
     public int weatherTemp;
     public int carTemp;
 
-    // TODO: 1) get openweather to update (different values) 2) add color/style 3) add dog emoji to title
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +33,6 @@ public class MainStatusActivity extends AppCompatActivity {
         introMessage.setText("Fetching weather...");
 
         Ion.with(this)
-                //.load("http://samples.openweathermap.org/data/2.5/weather?zip=94309,us&appid=cf0db33c54ec1e79b44c3a0f1eefe993")
                 .load("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=e85efc8567284f2d837194233171902&q=94309&num_of_days=1&format=json")
                 .asString()
                 .setCallback(new FutureCallback<String>() {
@@ -52,9 +49,7 @@ public class MainStatusActivity extends AppCompatActivity {
         introMessage.setText("Fetching weather...");
 
         Ion.with(this)
-                .load("http://10.19.190.14:1880/mytemp") // make sure it's the right URL
-                // go to it on browser to see what JSON looks like; if different, may need to call a different JSON processing function
-                // FORMAT: {temp}:{48.9}; may need to change
+                .load("http://10.19.190.14:1880/mytemp") 
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -66,14 +61,12 @@ public class MainStatusActivity extends AppCompatActivity {
                         } catch (JSONException e1) {
                             e1.printStackTrace();
                         }
-                        processCarTemp(json); // commenting out until we can get node red working again
+                        processCarTemp(json); 
                     }
                 });
     }
 
     public void goToGraph(View view) {
-        //Log.d("MainStatusActivity","I am here");
-        //System.out.println(carTemp);
         Intent intent = new Intent(this, HeatGraphsActivity.class);
         intent.putExtra("weatherTemp", weatherTemp);
         intent.putExtra("carTemp", carTemp);
@@ -95,12 +88,10 @@ public class MainStatusActivity extends AppCompatActivity {
         }
     }
 
-    /* I know I should factor out common code, but I'm trying to extract null object reference bug at the moment */
     public void processCarTemp(JSONObject jsonObject) {
         try {
-            //JSONObject json = new JSONObject(result);
             int localCarTemp = jsonObject.getInt("temp");
-            carTemp = (int) celsiusToFahrenheit((double) localCarTemp); // issue is casting
+            carTemp = (int) celsiusToFahrenheit((double) localCarTemp); 
             TextView carText = (TextView) findViewById(R.id.mytemp_info);
             carText.setText(String.valueOf(carTemp) + " °F");
         } catch (JSONException jsone) {
