@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main_status"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.john.tempsense.MainStatusActivity"
+    android:background="#303030">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fetching weather..."
+        android:textSize="24dp"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:id="@+id/weather_info"
+        android:layout_marginTop="44dp"
+        android:layout_below="@+id/introTemp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Current temperature in car: "
+        android:textSize="18dp"
+        android:textColor="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/introMyTemp"
+        android:layout_marginTop="58dp"
+        android:layout_below="@+id/weather_info"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="How hot can it get?"
+        android:textColor="#1e1d1d"
+        android:background="@drawable/orange_rect"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginBottom="22dp"
+        android:id="@+id/goToGraph"
+        android:onClick="goToGraph" />
+
+    <TextView
+        android:text="Fetching weather..."
+        android:textSize="24dp"
+        android:textColor="#FFFFFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mytemp_info"
+        android:layout_below="@+id/introMyTemp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp" />
+
+    <ImageView
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/dog_emoji"
+        android:id="@+id/imageView"
+        android:layout_width="50dp"
+        android:layout_alignTop="@+id/title"
+        android:layout_alignEnd="@+id/goToGraph" />
+
+    <TextView
+        android:text="hotDog"
+        android:textSize="30dp"
+        android:textColor="#FFFFFF"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_marginTop="25dp"
+        android:id="@+id/title"
+        android:layout_width="250dp"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/imageView"
+        android:layout_marginEnd="12dp" />
+
+    <TextView
+        android:text="Current temperature in Stanford, CA:"
+        android:textSize="18dp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:id="@+id/introTemp"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>
