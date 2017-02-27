@@ -75,8 +75,7 @@ public class HeatGraphsActivity extends AppCompatActivity {
      *  Function from WA, data from https://www.avma.org/public/PetCare/Pages/Estimated-Vehicle-Interior-Air-Temperature-v.-Elapsed-Time.aspx
      */
     public double logRegression(double timeElapsed) {
-        return 10.6234*Math.log(logFactor()*timeElapsed);
-        //return 10.6234*Math.log(timeElapsed); // I KNOW WHY it's crashing; log 0 gives garbage value
+        return 10.6234*Math.log(logFactor()*timeElapsed); 
     }
 
     /* Getting the logarithmic multiplication factors from an exponential function; they kept increasing at an increasing rate as the starting temperature increased,
@@ -90,7 +89,4 @@ public class HeatGraphsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainStatusActivity.class);
         startActivity(intent);
     }
-
-    // todo: can have message that displays threat level based on temp
-    // straight horizontal line on graph that shows carTemp
 }
