@@ -19,12 +19,29 @@ import static android.graphics.Color.CYAN;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.WHITE;
 
+
+/* TreeHacks 2017
+ * Author: John Romano
+ * -------------------
+ * HotDog: An IoT app with the purpose of keeping pets safe from overheating
+ * and users informed of the current temperature in their cars. The Android
+ * component of the app serves to display current local temperature and
+ * sensor temperature through interaction with weather API and Node-RED.
+ * In both cases, temperature data is received as a JSON and parsed accordingly.
+ * -----------------------------------------------------------------------------
+ * HeatGraphsActivity: Displays a graph of extrapolated interior vehicle temperature
+ * vs. time elapsed to give the user a better idea of how fast it can get hot based
+ * on the current local temperature.
+ */
 public class HeatGraphsActivity extends AppCompatActivity {
 
     public double weatherTemp;
-    public double carTemp;
 
     @Override
+    /* onCreate
+     * --------
+     * Receives temperatures from MainStatusActivity to generate graphs from.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -32,11 +49,16 @@ public class HeatGraphsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         weatherTemp = intent.getDoubleExtra("weatherTemp", weatherTemp);
-        carTemp = intent.getDoubleExtra("carTemp", carTemp);
 
         initializeGraph();
     }
 
+    /* initializeGraph
+     * ---------------
+     * Using the GraphView library, temperature data points are plotted at 10 minute intervals to
+     * give the user a visual representation of the rate of temperature increase based on the current
+     * local temperature.
+     */
     public void initializeGraph() {
         GraphView graph = (GraphView) findViewById(R.id.heat_graph);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
@@ -60,31 +82,47 @@ public class HeatGraphsActivity extends AppCompatActivity {
         series.setBackgroundColor(WHITE);
         series.setColor(WHITE);
 
-// custom paint to make a dotted line
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        paint.setColor(CYAN);
+        paint.setColor(CYAN); // set color of plot line to be blue
         paint.setPathEffect(new DashPathEffect(new float[]{8, 5}, 0));
         series.setCustomPaint(paint);
         graph.addSeries(series);
     }
 
-    /* Quartic function regression acquired from WolframAlpha (curve fit command)
-     *  Car temperature data retrieved from: https://www.avma.org/public/PetCare/Pages/Estimated-Vehicle-Interior-Air-Temperature-v.-Elapsed-Time.aspx
-     *  Function from WA, data from https://www.avma.org/public/PetCare/Pages/Estimated-Vehicle-Interior-Air-Temperature-v.-Elapsed-Time.aspx
+
+    /* logRegression
+     * -------------
+     * Based on the time elapsed, calculate what the extrapolated temperature will likely be.
+     * The logarithmic regression function was formed with Wolfram Alpha on data pulled from
+     * an avma.org study of interior vehicular temperature increase based on starting temperature.
+     *
+     * Quartic function regression acquired from WolframAlpha (curve fit command)
+     * Car temperature data retrieved from: https://www.avma.org/public/PetCare/Pages/Estimated-Vehicle-Interior-Air-Temperature-v.-Elapsed-Time.aspx
      */
     public double logRegression(double timeElapsed) {
-        return 10.6234*Math.log(logFactor()*timeElapsed); 
+        return 10.6234*Math.log(logFactor()*timeElapsed);
     }
 
-    /* Getting the logarithmic multiplication factors from an exponential function; they kept increasing at an increasing rate as the starting temperature increased,
-    * so I captured that rate of increase as an exponential function so that I could have a general factor for any starting temp */
-    // Wolfram Alpha command: exp fit {{70, 613.389w}, {75, 982.068}, {80, 1572.34}, {85, 2517.4}, {90, 4030.49}, {95, 6453.03}}
+
+    /* logFactor
+     * ---------
+     * The multiplier inside the logRegression expression (b in a*log(b*timeElapsed)) kept increasing
+     * when observed in Wolfram Alpha. I captured the rate of increase of this factor by mapping the
+     * starting temperature to its multiplier so that I could have a general multiplier for any starting temperature.
+     *
+     * Wolfram Alpha command: exp fit {{70, 613.389w}, {75, 982.068}, {80, 1572.34}, {85, 2517.4}, {90, 4030.49}, {95, 6453.03}}
+     */
     public double logFactor() {
         return 0.843443*Math.exp(0.0941323*weatherTemp);
     }
 
+
+    /* goBackToMain
+     * ------------
+     * Go back to MainStatusActivity when return button pressed.
+     */
     public void goBackToMain(View view) {
         Intent intent = new Intent(this, MainStatusActivity.class);
         startActivity(intent);

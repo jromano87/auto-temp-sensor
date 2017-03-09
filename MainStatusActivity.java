@@ -12,6 +12,19 @@ import org.json.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+
+/* TreeHacks 2017
+ * Author: John Romano
+ * -------------------
+ * HotDog: An IoT app with the purpose of keeping pets safe from overheating
+ * and users informed of the current temperature in their cars. The Android
+ * component of the app serves to display current local temperature and
+ * sensor temperature through interaction with weather API and Node-RED.
+ * In both cases, temperature data is received as a JSON and parsed accordingly.
+ * -----------------------------------------------------------------------------
+ * MainStatusActivity: The main dashboard that displays current local temperature
+ * and sensor temperature (current temperature in the car).
+ */
 public class MainStatusActivity extends AppCompatActivity {
 
     public static final int NUM_DOUBLE_PLACES = 2;
@@ -19,6 +32,10 @@ public class MainStatusActivity extends AppCompatActivity {
     public int carTemp;
 
     @Override
+    /* onCreate
+     * --------
+     * Set main view of app and call both helper functions.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -28,9 +45,15 @@ public class MainStatusActivity extends AppCompatActivity {
         loadCarTempData();
     }
 
+
+    /* loadWeatherData
+     * ---------------
+     * Used the Ion library to load the JSON data from the weather API. Calls the processWeather
+     * function to edit the TextView widget to show the current local temperature.
+     */
     public void loadWeatherData() {
         TextView introMessage = (TextView) findViewById(R.id.weather_info);
-        introMessage.setText("Fetching weather...");
+        introMessage.setText("Fetching weather..."); // shows in case data isn't loading
 
         Ion.with(this)
                 .load("http://api.worldweatheronline.com/premium/v1/weather.ashx?key=e85efc8567284f2d837194233171902&q=94309&num_of_days=1&format=json")
@@ -44,12 +67,17 @@ public class MainStatusActivity extends AppCompatActivity {
                 });
     }
 
+
+    /* loadCarTempData
+     * ---------------
+     * Uses the Ion library to obtain JSON data from Node-RED
+     */
     public void loadCarTempData() {
         TextView introMessage = (TextView) findViewById(R.id.mytemp_info);
         introMessage.setText("Fetching weather...");
 
         Ion.with(this)
-                .load("http://10.19.190.14:1880/mytemp") 
+                .load("http://10.19.190.14:1880/mytemp") // was the URL of the Node-RED
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -57,22 +85,33 @@ public class MainStatusActivity extends AppCompatActivity {
                         // data has arrived
                         JSONObject json = null;
                         try {
-                            json = new JSONObject(result);
+                            json = new JSONObject(result); // giving null object because not connected to Node-RED; had to give hardware back at treehacks
                         } catch (JSONException e1) {
                             e1.printStackTrace();
                         }
-                        processCarTemp(json); 
+                        processCarTemp(json);
                     }
                 });
     }
 
+
+    /* goToGraph
+     * ---------
+     * Called when button pressed; goes to graph activity using an intent, passing in the current
+     * local temperature to generate graphs from.
+     */
     public void goToGraph(View view) {
         Intent intent = new Intent(this, HeatGraphsActivity.class);
         intent.putExtra("weatherTemp", weatherTemp);
-        intent.putExtra("carTemp", carTemp);
         startActivity(intent);
     }
 
+
+    /* processWeather
+     * --------------
+     * Updates the appropriate TextView to show the correct local weather temperature, obtaining
+     * data from the JSON object.
+     */
     public void processWeather(String result) {
         try {
             JSONObject json = new JSONObject(result);
@@ -88,10 +127,16 @@ public class MainStatusActivity extends AppCompatActivity {
         }
     }
 
+
+    /* processCarTemp
+     * --------------
+     * Updates the appropriate TextView to show the correct sensor temperature, obtaining data from
+     * the JSON object.
+     */
     public void processCarTemp(JSONObject jsonObject) {
         try {
             int localCarTemp = jsonObject.getInt("temp");
-            carTemp = (int) celsiusToFahrenheit((double) localCarTemp); 
+            carTemp = (int) celsiusToFahrenheit((double) localCarTemp); // issue is casting
             TextView carText = (TextView) findViewById(R.id.mytemp_info);
             carText.setText(String.valueOf(carTemp) + " °F");
         } catch (JSONException jsone) {
@@ -99,23 +144,15 @@ public class MainStatusActivity extends AppCompatActivity {
         }
     }
 
-    /* temp given in fahrenheit */
-    public double getFahrenheit(double temp) {
-        double ftemp = (((temp - 273) * 9/5) + 32);
-        return ftemp;
-    }
 
+    /* celsiusToFahrenheit
+     * -------------------
+     * Sensor temperature arrives in Celsius; must convert to Fahrenheit
+     */
     public double celsiusToFahrenheit(double temp) {
         double ftemp = 9 * (temp / 5) + 32;
         return ftemp;
     }
 
-    /* Need to truncate otherwise */
-    public String truncate(String value, int places) {
-        return new BigDecimal(value)
-                .setScale(places, RoundingMode.DOWN)
-                .stripTrailingZeros()
-                .toString();
-    }
 }
 
